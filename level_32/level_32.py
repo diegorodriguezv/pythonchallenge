@@ -22,7 +22,7 @@ def load_csp(file_name):
             if line.startswith('#') or line.startswith('\n'):
                 continue
             logical_line += 1
-            numbers = list(map(int, line.split()))
+            numbers = tuple(map(int, line.split()))
             if logical_line == 1:
                 w, h = numbers[0], numbers[1]
             elif 1 < logical_line <= w + 1:
@@ -31,7 +31,7 @@ def load_csp(file_name):
                 vert_constr.append(numbers)
             else:
                 break
-    return w, h, (horiz_constr), (vert_constr)
+    return w, h, tuple(horiz_constr), tuple(vert_constr)
 
 
 # csp = load_csp('data/warmup.txt')
@@ -230,7 +230,7 @@ def load_csp(file_name):
 # print('Constraints read OK')
 
 
-times = 1
+times = 20
 for filename in ('../data/warmup.txt',):
     for implementation in ('csp_number', 'csp_bitstring', 'csp_list'):
         csp_data = load_csp(filename)
@@ -243,7 +243,7 @@ for filename in ('../data/warmup.txt',):
             for line in solution:
                 # print(('{:0' + str(w) + 'b}').format(line).replace('1', '8').replace('0', ' '))
                 # print(line.replace('1', '8').replace('0', ' '))
-                print(line)
+                # print(line)
                 pass
         else:
             print('NOT FOUND')
@@ -256,7 +256,7 @@ for filename in ('../data/warmup.txt',):
             for line in solution:
                 # print(('{:0' + str(w) + 'b}').format(line).replace('1', '8').replace('0', ' '))
                 # print(line.replace('1', '8').replace('0', ' '))
-                print(line)
+                # print(line)
                 pass
         else:
             print('NOT FOUND')
@@ -311,21 +311,40 @@ pass
 # ../data/warmup.txt iterative_improvement(csp_bitstring): 0.010546875
 # ../data/warmup.txt backtracking_search(csp_list): 0.43046875
 # ../data/warmup.txt iterative_improvement(csp_list): 0.00703125
+# After changing constraints to tuples
+# ../data/warmup.txt backtracking_search(csp_number): 0.5875
+# ../data/warmup.txt iterative_improvement(csp_number): 0.021875
+# ../data/warmup.txt backtracking_search(csp_bitstring): 0.51796875
+# ../data/warmup.txt iterative_improvement(csp_bitstring): 0.009375
+# ../data/warmup.txt backtracking_search(csp_list): 0.4546875
+# ../data/warmup.txt iterative_improvement(csp_list): 0.00859375
+# Memoizing
+# ../data/warmup.txt backtracking_search(csp_number): 0.1015625
+# ../data/warmup.txt iterative_improvement(csp_number): 0.02109375
+# ../data/warmup.txt backtracking_search(csp_bitstring): 0.06875
+# ../data/warmup.txt iterative_improvement(csp_bitstring): 0.00546875
+# ../data/warmup.txt backtracking_search(csp_list): 0.06484375
+# ../data/warmup.txt iterative_improvement(csp_list): 0.00546875
 
-# filename = '../data/up.txt'
-# csp_data = load_csp(filename)
-# zero = time.process_time()
-# implementation = 'csp_list'
-# solution = backtracking.backtracking_search(csp_data, implementation)
-# print('{} backtracking_search({}): {}'.format(filename, implementation, time.process_time() - zero))
-# solution = iterimprov.iterative_improvement(csp_data, implementation)
-# print('{} iterative_improvement({}): {}'.format(filename, implementation, time.process_time() - zero))
-# for line in solution:
-#     # print(('{:0' + str(w) + 'b}').format(line).replace('1', '8').replace('0', ' '))
-#     # print(line.replace('1', '8').replace('0', ' '))
-#     print(line)
-#     # pass
 
+filename = '../data/up.txt'
+csp_data = load_csp(filename)
+zero = time.process_time()
+implementation = 'csp_list'
+solution = iterimprov.iterative_improvement(csp_data, implementation)
+print('{} iterative_improvement({}): {}'.format(filename, implementation, time.process_time() - zero))
+for line in solution:
+    # print(('{:0' + str(w) + 'b}').format(line).replace('1', '8').replace('0', ' '))
+    # print(line.replace('1', '8').replace('0', ' '))
+    print(line)
+    # pass
+solution = backtracking.backtracking_search(csp_data, implementation)
+print('{} backtracking_search({}): {}'.format(filename, implementation, time.process_time() - zero))
+for line in solution:
+    # print(('{:0' + str(w) + 'b}').format(line).replace('1', '8').replace('0', ' '))
+    # print(line.replace('1', '8').replace('0', ' '))
+    print(line)
+    # pass
 # up.txt
 #     To beat:
 #       0.578125

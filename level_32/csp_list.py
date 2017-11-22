@@ -6,6 +6,15 @@ def is_complete(csp, assignment):
     return len(assignment) == h
 
 
+@memoized
+def order_domain_values(csp, var):
+    w, h, horiz_constr, vert_constr = csp
+    # calculate the possible lengths and movements
+    # generate the numbers by moving sequences of ones
+    for bits in generate_bits(horiz_constr[var][::-1], w):
+        yield bits
+
+
 def generate_bits(constraint, length):
     return generate_bits_rec(constraint, length, bits=[], zeros=[], part=0)
 
@@ -28,21 +37,6 @@ def generate_bits_rec(constraint, length, bits, zeros, part):
             yield from generate_bits_rec(constraint, length, new_bits, new_zeros, new_part)
 
 
-def col_is_consistent(csp, assignment, constr, col):
-    w, h, horiz_constr, vert_constr = csp
-    row = [bits[col] for bits in assignment]
-    return row_is_consistent(csp, row, constr)
-
-
-# @memoized
-def order_domain_values(csp, var):
-    w, h, horiz_constr, vert_constr = csp
-    # calculate the possible lengths and movements
-    # generate the numbers by moving sequences of ones
-    for bits in generate_bits(horiz_constr[var][::-1], w):
-        yield bits
-
-
 def is_consistent(csp, assignment, value):
     w, h, horiz_constr, vert_constr = csp
     new_ass = assignment + [value]
@@ -51,6 +45,12 @@ def is_consistent(csp, assignment, value):
             if not col_is_consistent(csp, new_ass, vert_constr[col], col):
                 return False
     return True
+
+
+def col_is_consistent(csp, assignment, constr, col):
+    w, h, horiz_constr, vert_constr = csp
+    row = [bits[col] for bits in assignment]
+    return row_is_consistent(csp, row, constr)
 
 
 def row_is_consistent(csp, bits, constraint):
@@ -69,4 +69,4 @@ def row_is_consistent(csp, bits, constraint):
         prev = bit
     if current_length > 0:
         lengths_of_1.append(current_length)
-    return lengths_of_1 == constraint
+    return all([(a == b) for a, b in zip(lengths_of_1, constraint)])

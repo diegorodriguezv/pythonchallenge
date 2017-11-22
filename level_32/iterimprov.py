@@ -1,7 +1,9 @@
-import random
 import importlib
+import random
 
 csp_module = importlib.import_module('csp_bitstring')
+
+
 # import csp_bitstring as csp_module
 
 
@@ -75,4 +77,3 @@ def complete_assignment(csp):
         assignment.append(next(csp_module.order_domain_values(csp, var)))
     # todo: maybe choosing values consistent with the vertical constraints will speed things up since we start "nearer"
     return assignment
-

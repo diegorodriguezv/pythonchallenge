@@ -1,3 +1,6 @@
+from memoize import memoized
+
+
 def is_complete(csp, assignment):
     w, h, horiz_constr, vert_constr = csp
     return len(assignment) == h
@@ -11,6 +14,7 @@ def order_domain_values2(csp, var):
             yield bits
 
 
+@memoized
 def order_domain_values(csp, var):
     w, h, horiz_constr, vert_constr = csp
     # calculate the possible lengths and movements
@@ -48,12 +52,6 @@ def bits_to_num(bits):
     return result
 
 
-def col_is_consistent(csp, assignment, constr, col):
-    w, h, horiz_constr, vert_constr = csp
-    row = ''.join([('{:0' + str(w) + 'b}').format(bits)[col] for bits in assignment])
-    return bit_str_is_consistent(csp, row, constr)
-
-
 def is_consistent(csp, assignment, value):
     w, h, horiz_constr, vert_constr = csp
     new_ass = assignment + [value]
@@ -62,6 +60,12 @@ def is_consistent(csp, assignment, value):
             if not col_is_consistent(csp, new_ass, vert_constr[col], col):
                 return False
     return True
+
+
+def col_is_consistent(csp, assignment, constr, col):
+    w, h, horiz_constr, vert_constr = csp
+    row = ''.join([('{:0' + str(w) + 'b}').format(bits)[col] for bits in assignment])
+    return bit_str_is_consistent(csp, row, constr)
 
 
 def bit_str_is_consistent(csp, bin_bits_str, constraint):
@@ -80,7 +84,7 @@ def bit_str_is_consistent(csp, bin_bits_str, constraint):
         prev = bit == '1'
     if current_length > 0:
         lengths_of_1.append(current_length)
-    return lengths_of_1 == constraint
+    return all([(a == b) for a, b in zip(lengths_of_1, constraint)])
 
 
 def row_is_consistent(csp, value, constraint):
@@ -105,4 +109,4 @@ def row_is_consistent(csp, value, constraint):
         prev = bit
     if current_length > 0:
         lengths_of_1.append(current_length)
-    return lengths_of_1 == constraint
+    return all([(a == b) for a, b in zip(lengths_of_1, constraint)])
