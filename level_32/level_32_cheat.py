@@ -33,7 +33,7 @@ class Bar:
 
 
 def load():
-    with open("data/up.txt") as f:
+    with open("../data/up.txt") as f:
         lines = f.readlines()
         lines = [line.strip() for line in lines if (not line.startswith('#')) and len(line.strip()) != 0]
         raw = [list(map(int, line.split())) for line in lines]
@@ -193,7 +193,10 @@ while True:
 print_board(board[0])
 
 print(time.process_time())
+# warmup
 # 0.03125
 # 0.046875
 
+# up
+# 0.578125
 # 0.625
