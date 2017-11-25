@@ -39,7 +39,7 @@ def generate_bits_rec(constraint, length, bits, zeros, part):
 
 def is_consistent(csp, assignment, value):
     w, h, horiz_constr, vert_constr = csp
-    new_ass = assignment + [value]
+    new_ass = assign_value(assignment, value, len(assignment))
     if len(new_ass) == h:
         for col in range(len(vert_constr)):
             if not col_is_consistent(csp, new_ass, vert_constr[col], col):
@@ -69,4 +69,29 @@ def row_is_consistent(csp, bits, constraint):
         prev = bit
     if current_length > 0:
         lengths_of_1.append(current_length)
-    return all([(a == b) for a, b in zip(lengths_of_1, constraint)])
+    return len(lengths_of_1) == len(constraint) and all([(a == b) for a, b in zip(lengths_of_1, constraint)])
+
+
+def complete_assignment(csp):
+    w, h, horiz_constr, vert_constr = csp
+    assignment = null_assignment()
+    for var in range(h):
+        assignment = assign_value(assignment, next(order_domain_values(csp, var)), var)
+    # todo: maybe choosing values consistent with the vertical constraints will speed things up since we start "nearer"
+    return assignment
+
+
+# def assign_value(assignment, value, var):
+#     return assignment[:var] + [value] + assignment[var + 1:]
+#
+#
+# def null_assignment():
+#     return []
+
+
+def assign_value(assignment, value, var):
+    return assignment[:var] + (value,) + assignment[var + 1:]
+
+
+def null_assignment():
+    return ()

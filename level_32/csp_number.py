@@ -84,7 +84,7 @@ def bit_str_is_consistent(csp, bin_bits_str, constraint):
         prev = bit == '1'
     if current_length > 0:
         lengths_of_1.append(current_length)
-    return all([(a == b) for a, b in zip(lengths_of_1, constraint)])
+    return len(lengths_of_1) == len(constraint) and all([(a == b) for a, b in zip(lengths_of_1, constraint)])
 
 
 def row_is_consistent(csp, value, constraint):
@@ -109,4 +109,21 @@ def row_is_consistent(csp, value, constraint):
         prev = bit
     if current_length > 0:
         lengths_of_1.append(current_length)
-    return all([(a == b) for a, b in zip(lengths_of_1, constraint)])
+    return len(lengths_of_1) == len(constraint) and all([(a == b) for a, b in zip(lengths_of_1, constraint)])
+
+
+def complete_assignment(csp):
+    w, h, horiz_constr, vert_constr = csp
+    assignment = []
+    for var in range(h):
+        assignment.append(next(order_domain_values(csp, var)))
+    # todo: maybe choosing values consistent with the vertical constraints will speed things up since we start "nearer"
+    return assignment
+
+
+def assign_value(assignment, value, var):
+    return assignment[:var] + [value] + assignment[var + 1:]
+
+
+def null_assignment():
+    return []

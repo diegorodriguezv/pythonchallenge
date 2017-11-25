@@ -5,11 +5,11 @@
 # Variables = row[k]
 # Each lengths is a variable that has values from the
 # Domain = lengths where sum(lengths) - len(lengths) + 1 <= max_len
-
+import os
+import re
 import time
 
 import backtracking
-import iterimprov
 
 
 def load_csp(file_name):
@@ -229,11 +229,15 @@ def load_csp(file_name):
 #     assert sum(vert_constr[i]) - len(vert_constr[i]) + 1 <= h
 # print('Constraints read OK')
 
+tests_dir = 'data/'
+tests_patterns = r'level_32_test_03_[0-9]+.*\.txt', r'level_32_test_04_[0-9]+.*\.txt'
+files = [f for f in os.listdir(tests_dir) if any([re.match(pat, f) for pat in tests_patterns])]
+print(files)
 
-times = 20
-for filename in ('../data/warmup.txt',):
-    for implementation in ('csp_number', 'csp_bitstring', 'csp_list'):
-        csp_data = load_csp(filename)
+times = 1
+for filename in files:
+    for implementation in ('csp_tuple',):  # 'csp_list', 'csp_bitstring', 'csp_number'):
+        csp_data = load_csp(tests_dir + filename)
         zero = time.process_time()
         for _ in range(times):
             solution = backtracking.backtracking_search(csp_data, implementation)
@@ -243,23 +247,23 @@ for filename in ('../data/warmup.txt',):
             for line in solution:
                 # print(('{:0' + str(w) + 'b}').format(line).replace('1', '8').replace('0', ' '))
                 # print(line.replace('1', '8').replace('0', ' '))
-                # print(line)
+                print(line)
                 pass
         else:
             print('NOT FOUND')
-        zero = time.process_time()
-        for _ in range(times):
-            solution = iterimprov.iterative_improvement(csp_data, implementation)
-        elapsed = time.process_time() - zero
-        print('{} iterative_improvement({}): {}'.format(filename, implementation, elapsed / times))
-        if solution:
-            for line in solution:
-                # print(('{:0' + str(w) + 'b}').format(line).replace('1', '8').replace('0', ' '))
-                # print(line.replace('1', '8').replace('0', ' '))
-                # print(line)
-                pass
-        else:
-            print('NOT FOUND')
+            # zero = time.process_time()
+            # for _ in range(times):
+            #     solution = iterimprov.iterative_improvement(csp_data, implementation)
+            # elapsed = time.process_time() - zero
+            # print('{} iterative_improvement({}): {}'.format(filename, implementation, elapsed / times))
+            # if solution:
+            #     for line in solution:
+            #         # print(('{:0' + str(w) + 'b}').format(line).replace('1', '8').replace('0', ' '))
+            #         # print(line.replace('1', '8').replace('0', ' '))
+            #         print(line)
+            #         pass
+            # else:
+            #     print('NOT FOUND')
 pass
 # warmup.txt backtracking
 #   generate values by brute force
@@ -279,73 +283,54 @@ pass
 #         0.03125
 #         0.046875
 
-# warmup.txt  iterative improvement
-#   generate values by brute force
-#     using bit strings as assignment
-#       0.125
-#       0.1-0.03
-#     using numbers
-#       0.14 - 0.03 ¿?
-#   generate values moving bits
-#     using bit strings as assignment
-#       0.015625 - 0.03125
-#     using numbers
-#       0.015625
-#     using lists
-#       0.015625
-#     To beat:
-#       warmup
-#         0.03125
-#         0.046875
-
-# ../data/warmup.txt backtracking_search(csp_number): 0.616796875
-# ../data/warmup.txt iterative_improvement(csp_number): 0.02265625
-# ../data/warmup.txt backtracking_search(csp_bitstring): 0.546484375
-# ../data/warmup.txt iterative_improvement(csp_bitstring): 0.009765625
-# ../data/warmup.txt backtracking_search(csp_list): 0.47109375
-# ../data/warmup.txt iterative_improvement(csp_list): 0.0078125
-# After improving row_is_consistent to fail fast and remove result.extend
-# ../data/warmup.txt backtracking_search(csp_number): 0.570703125
-# ../data/warmup.txt iterative_improvement(csp_number): 0.026953125
-# ../data/warmup.txt backtracking_search(csp_bitstring): 0.498828125
-# ../data/warmup.txt iterative_improvement(csp_bitstring): 0.010546875
-# ../data/warmup.txt backtracking_search(csp_list): 0.43046875
-# ../data/warmup.txt iterative_improvement(csp_list): 0.00703125
-# After changing constraints to tuples
-# ../data/warmup.txt backtracking_search(csp_number): 0.5875
-# ../data/warmup.txt iterative_improvement(csp_number): 0.021875
-# ../data/warmup.txt backtracking_search(csp_bitstring): 0.51796875
-# ../data/warmup.txt iterative_improvement(csp_bitstring): 0.009375
-# ../data/warmup.txt backtracking_search(csp_list): 0.4546875
-# ../data/warmup.txt iterative_improvement(csp_list): 0.00859375
-# Memoizing
-# ../data/warmup.txt backtracking_search(csp_number): 0.1015625
-# ../data/warmup.txt iterative_improvement(csp_number): 0.02109375
-# ../data/warmup.txt backtracking_search(csp_bitstring): 0.06875
-# ../data/warmup.txt iterative_improvement(csp_bitstring): 0.00546875
-# ../data/warmup.txt backtracking_search(csp_list): 0.06484375
-# ../data/warmup.txt iterative_improvement(csp_list): 0.00546875
+# not memoizing
+#     constraints are tuples
+#
+#     constraints are lists
+#
+# memoizing domain values
+#
+# in csp_tuple
+#     not memoizing
+#         assignment is lists: 0.34453125
+#         assignment is tuples: 0.3359375
+#     memoizing only domain_values
+#         assignment is lists: 0.08671875
+#         assignment is tuples: 0.07734375
+#     memoize only row_is_consistent
+#         assignment is lists: 0.34765625
+#         assignment is tuples: 0.3390625
+#     memoize only col_is_consistent
+#         assignment is tuples: 0.3375
+#     memoize only is_consistent
+#         assignment is tuples: 0.35625
+#     memoize everything
+#         assignment is tuples: 0.08828125
 
 
-filename = '../data/up.txt'
-csp_data = load_csp(filename)
-zero = time.process_time()
-implementation = 'csp_list'
-solution = iterimprov.iterative_improvement(csp_data, implementation)
-print('{} iterative_improvement({}): {}'.format(filename, implementation, time.process_time() - zero))
-for line in solution:
-    # print(('{:0' + str(w) + 'b}').format(line).replace('1', '8').replace('0', ' '))
-    # print(line.replace('1', '8').replace('0', ' '))
-    print(line)
-    # pass
-solution = backtracking.backtracking_search(csp_data, implementation)
-print('{} backtracking_search({}): {}'.format(filename, implementation, time.process_time() - zero))
-for line in solution:
-    # print(('{:0' + str(w) + 'b}').format(line).replace('1', '8').replace('0', ' '))
-    # print(line.replace('1', '8').replace('0', ' '))
-    print(line)
-    # pass
-# up.txt
-#     To beat:
-#       0.578125
-#       0.625
+
+
+
+
+# filename = '../data/up.txt'
+# csp_data = load_csp(filename)
+# zero = time.process_time()
+# implementation = 'csp_list'
+# solution = iterimprov.iterative_improvement(csp_data, implementation)
+# print('{} iterative_improvement({}): {}'.format(filename, implementation, time.process_time() - zero))
+# for line in solution:
+#     # print(('{:0' + str(w) + 'b}').format(line).replace('1', '8').replace('0', ' '))
+#     # print(line.replace('1', '8').replace('0', ' '))
+#     print(line)
+#     # pass
+# solution = backtracking.backtracking_search(csp_data, implementation)
+# print('{} backtracking_search({}): {}'.format(filename, implementation, time.process_time() - zero))
+# for line in solution:
+#     # print(('{:0' + str(w) + 'b}').format(line).replace('1', '8').replace('0', ' '))
+#     # print(line.replace('1', '8').replace('0', ' '))
+#     print(line)
+#     # pass
+# # up.txt
+# #     To beat:
+# #       0.578125
+# #       0.625
